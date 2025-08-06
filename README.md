@@ -54,7 +54,7 @@ TOKEN=your_turso_auth_token
 
    ```bash
    git clone https://github.com/Aquiles-ai/aquiles-chat-demo.git
-   cd aquiles-ai-demo
+   cd aquiles-chat-demo
    ```
 
 2. **Install dependencies**
