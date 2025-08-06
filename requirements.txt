@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+openai
+aquiles-rag
+Artemisa
+libsql
+python-dotenv
+platformdirs

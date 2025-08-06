@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aquiles-ai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'dark-bg': '#0f0f0f',
+                        'dark-sidebar': '#1a1a1a',
+                        'dark-border': '#2a2a2a',
+                        'dark-input': '#2a2a2a',
+                        'light-bg': '#ffffff',
+                        'light-sidebar': '#f8f9fa',
+                        'light-border': '#e5e7eb',
+                        'light-input': '#f3f4f6',
+                        'blue-accent': '#3b82f6'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom styles for markdown content */
+        .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+        .dark .prose h1, .dark .prose h2, .dark .prose h3, .dark .prose h4, .dark .prose h5, .dark .prose h6 {
+            color: #f9fafb;
+        }
+        .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+            color: #111827;
+        }
+        .prose p {
+            margin-bottom: 1em;
+            line-height: 1.6;
+        }
+        .dark .prose code {
+            background-color: #374151;
+            color: #f9fafb;
+        }
+        .prose code {
+            background-color: #f3f4f6;
+            color: #111827;
+            padding: 0.2em 0.4em;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+        }
+        .dark .prose pre {
+            background-color: #1f2937;
+        }
+        .prose pre {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1em 0;
+            border: 1px solid #e5e7eb;
+        }
+        .prose pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        .prose ul, .prose ol {
+            margin: 1em 0;
+            padding-left: 1.5em;
+        }
+        .prose li {
+            margin: 0.5em 0;
+        }
+        .prose blockquote {
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+            margin: 1em 0;
+            font-style: italic;
+        }
+        .dark .prose blockquote {
+            color: #d1d5db;
+        }
+        .prose blockquote {
+            color: #6b7280;
+        }
+        .prose strong {
+            font-weight: 600;
+        }
+        .dark .prose strong {
+            color: #f9fafb;
+        }
+        .prose strong {
+            color: #111827;
+        }
+        .prose em {
+            font-style: italic;
+        }
+        .prose a {
+            color: #3b82f6;
+            text-decoration: underline;
+        }
+        .prose a:hover {
+            color: #60a5fa;
+        }
+
+        /* Theme transition */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-light-bg dark:bg-dark-bg text-gray-900 dark:text-white min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-light-sidebar dark:bg-dark-sidebar border-b border-light-border dark:border-dark-border px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <h1 class="text-xl font-semibold">Aquiles-ai</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+            <a href="/upload" class="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <span>Docs in RAG</span>
+            </a>
+            <button id="themeToggle" class="p-2 rounded-lg hover:bg-light-border dark:hover:bg-dark-border transition-colors">
+                <!-- Sun icon (visible in dark mode) -->
+                <svg id="sunIcon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <!-- Moon icon (visible in light mode) -->
+                <svg id="moonIcon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <div class="flex h-[calc(100vh-64px)]">
+        <!-- Sidebar -->
+        <div class="w-80 bg-light-sidebar dark:bg-dark-sidebar border-r border-light-border dark:border-dark-border p-4 overflow-y-auto">
+            <div class="space-y-6">
+                <!-- Model Selection -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-3">Model</h3>
+                    <div class="space-y-2">
+                        <div class="bg-light-border dark:bg-dark-border rounded-lg p-3 border border-blue-accent">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-blue-accent rounded-lg flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-medium">gpt-4.1</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">Optimized for RAG</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Settings -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-3">Settings</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1">Top K Documents</label>
+                            <select id="topK" class="w-full bg-light-input dark:bg-dark-input border border-light-border dark:border-dark-border rounded-lg px-3 py-2 text-gray-900 dark:text-white">
+                                <option value="3">3</option>
+                                <option value="5" selected>5</option>
+                                <option value="7">7</option>
+                                <option value="10">10</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1">System Type</label>
+                            <select id="typeSystem" class="w-full bg-light-input dark:bg-dark-input border border-light-border dark:border-dark-border rounded-lg px-3 py-2 text-gray-900 dark:text-white">
+                                <option value="Assistant" selected>Assistant</option>
+                                <option value="Expert">Expert</option>
+                                <option value="Researcher">Researcher</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Connection Status -->
+                <div class="flex items-center space-x-2 text-sm">
+                    <div id="connectionStatus" class="w-2 h-2 rounded-full bg-red-400"></div>
+                    <span id="connectionText" class="text-gray-500 dark:text-gray-400">Disconnected</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="flex-1 flex flex-col">
+            <!-- Chat Messages -->
+            <div id="chatContainer" class="flex-1 overflow-y-auto p-6">
+                <div class="max-w-3xl mx-auto">
+                    <!-- Welcome Message -->
+                    <div id="welcomeMessage" class="text-center py-20">
+                        <h2 class="text-3xl font-semibold mb-6">I'm Aquiles-ai—how can I help?</h2>
+                        <div class="space-y-4 max-w-2xl mx-auto">
+                            <button class="suggestion-btn w-full text-left p-4 rounded-lg border border-light-border dark:border-dark-border hover:bg-light-sidebar dark:hover:bg-dark-sidebar transition-colors">
+                                <div class="flex items-center space-x-3">
+                                    <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                    </svg>
+                                    <span>What documents do you have indexed in RAG?</span>
+                                </div>
+                            </button>
+                            <button class="suggestion-btn w-full text-left p-4 rounded-lg border border-light-border dark:border-dark-border hover:bg-light-sidebar dark:hover:bg-dark-sidebar transition-colors">
+                                <div class="flex items-center space-x-3">
+                                    <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                                    </svg>
+                                    <span>Explícame el contenido de los documentos subidos</span>
+                                </div>
+                            </button>
+                            <button class="suggestion-btn w-full text-left p-4 rounded-lg border border-light-border dark:border-dark-border hover:bg-light-sidebar dark:hover:bg-dark-sidebar transition-colors">
+                                <div class="flex items-center space-x-3">
+                                    <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span>Summarize the available information</span>
+                                </div>
+                            </button>
+                            <button class="suggestion-btn w-full text-left p-4 rounded-lg border border-light-border dark:border-dark-border hover:bg-light-sidebar dark:hover:bg-dark-sidebar transition-colors">
+                                <div class="flex items-center space-x-3">
+                                    <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                    <span>Sugiere una pregunta basada en los documentos</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chat Messages Container -->
+                    <div id="messagesContainer" class="space-y-6 hidden">
+                        <!-- Messages will be added here dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="border-t border-light-border dark:border-dark-border p-4">
+                <div class="max-w-3xl mx-auto">
+                    <div class="relative">
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="Ask anything" 
+                            class="w-full bg-light-input dark:bg-dark-input border border-light-border dark:border-dark-border rounded-lg px-4 py-3 pr-12 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
+                            rows="1"
+                        ></textarea>
+                        <button 
+                            id="sendButton" 
+                            class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-accent hover:bg-blue-600 rounded-lg p-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
+                        Aquiles-ai can make mistakes. Check important info.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let websocket = null;
+        let isConnected = false;
+
+        // Theme management
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            
+            if (isDark) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Initialize theme on page load
+        initTheme();
+
+        // Theme toggle button
+        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+        // Auto-resize textarea
+        const messageInput = document.getElementById('messageInput');
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        // Update connection status
+        function updateConnectionStatus(connected) {
+            const statusDot = document.getElementById('connectionStatus');
+            const statusText = document.getElementById('connectionText');
+            
+            if (connected) {
+                statusDot.className = 'w-2 h-2 rounded-full bg-green-400';
+                statusText.textContent = 'Connected';
+            } else {
+                statusDot.className = 'w-2 h-2 rounded-full bg-red-400';
+                statusText.textContent = 'Disconnected';
+            }
+        }
+
+        // Send message function
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            const topK = document.getElementById('topK').value;
+            const typeSystem = document.getElementById('typeSystem').value;
+
+            // Hide welcome message and show chat
+            document.getElementById('welcomeMessage').classList.add('hidden');
+            document.getElementById('messagesContainer').classList.remove('hidden');
+
+            // Add user message
+            addMessage(message, 'user');
+            
+            // Clear input
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+
+            // Add loading indicator for assistant
+            const assistantMessageId = addMessage('', 'assistant', true);
+            
+            // Connect to WebSocket and send message
+            connectWebSocket(message, topK, typeSystem, assistantMessageId);
+        }
+
+        // Add message to chat
+        function addMessage(content, role, isLoading = false) {
+            const messagesContainer = document.getElementById('messagesContainer');
+            const messageId = 'msg-' + Date.now();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.id = messageId;
+            messageDiv.className = 'flex space-x-4';
+            
+            const avatar = role === 'user' 
+                ? '<div class="w-8 h-8 bg-blue-accent rounded-full flex items-center justify-center flex-shrink-0"><span class="text-sm font-bold text-white">U</span></div>'
+                : '<div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0"><span class="text-sm font-bold text-white">A</span></div>';
+            
+            let messageContent = '';
+            if (isLoading) {
+                messageContent = `
+                    <div class="loading-indicator flex items-center space-x-2 text-gray-500 dark:text-gray-400">
+                        <div class="flex space-x-1">
+                            <div class="w-2 h-2 bg-gray-500 dark:bg-gray-400 rounded-full animate-bounce"></div>
+                            <div class="w-2 h-2 bg-gray-500 dark:bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                            <div class="w-2 h-2 bg-gray-500 dark:bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                        </div>
+                        <span class="text-sm">Thinking...</span>
+                    </div>
+                `;
+            } else {
+                messageContent = `<div class="message-content prose prose-gray dark:prose-invert max-w-none">${content}</div>`;
+            }
+            
+            messageDiv.innerHTML = `
+                ${avatar}
+                <div class="flex-1">
+                    ${messageContent}
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            return messageId;
+        }
+
+        // WebSocket connection
+        function connectWebSocket(query, topK, typeSystem, messageId) {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/chat`;
+            
+            websocket = new WebSocket(wsUrl);
+            let assistantContent = '';
+            let hasReceivedContent = false;
+            
+            websocket.onopen = function() {
+                isConnected = true;
+                updateConnectionStatus(true);
+                websocket.send(JSON.stringify({
+                    query: query,
+                    top_k: topK,
+                    type_sys: typeSystem
+                }));
+            };
+            
+            websocket.onmessage = function(event) {
+                const messageElement = document.getElementById(messageId);
+                if (messageElement) {
+                    // Remove loading indicator on first message
+                    if (!hasReceivedContent) {
+                        const loadingIndicator = messageElement.querySelector('.loading-indicator');
+                        if (loadingIndicator) {
+                            loadingIndicator.remove();
+                        }
+                        // Add content container
+                        const flexDiv = messageElement.querySelector('.flex-1');
+                        flexDiv.innerHTML = '<div class="message-content prose prose-gray dark:prose-invert max-w-none"></div>';
+                        hasReceivedContent = true;
+                    }
+                    
+                    assistantContent += event.data;
+                    const contentElement = messageElement.querySelector('.message-content');
+                    
+                    // Parse markdown and render
+                    try {
+                        const htmlContent = marked.parse(assistantContent);
+                        contentElement.innerHTML = htmlContent;
+                    } catch (error) {
+                        // Fallback to plain text if markdown parsing fails
+                        contentElement.innerHTML = assistantContent.replace(/\n/g, '<br>');
+                    }
+                    
+                    // Scroll to bottom
+                    const container = document.getElementById('chatContainer');
+                    container.scrollTop = container.scrollHeight;
+                }
+            };
+            
+            websocket.onclose = function() {
+                isConnected = false;
+                updateConnectionStatus(false);
+            };
+            
+            websocket.onerror = function(error) {
+                console.error('WebSocket error:', error);
+                isConnected = false;
+                updateConnectionStatus(false);
+                const messageElement = document.getElementById(messageId);
+                if (messageElement) {
+                    const contentElement = messageElement.querySelector('.message-content') || 
+                                         messageElement.querySelector('.flex-1');
+                    contentElement.innerHTML = '<span class="text-red-400">Error connecting to server</span>';
+                }
+            };
+        }
+
+        // Event listeners
+        document.getElementById('sendButton').addEventListener('click', sendMessage);
+        
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Suggestion buttons
+        document.querySelectorAll('.suggestion-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const text = this.querySelector('span').textContent;
+                messageInput.value = text;
+                sendMessage();
+            });
+        });
+
+        // Initialize connection status
+        updateConnectionStatus(false);
+    </script>
+</body>
+</html>
