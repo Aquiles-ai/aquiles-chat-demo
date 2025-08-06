@@ -84,18 +84,17 @@ TOKEN=your_turso_auth_token
 
 Project UI in action:
 
-<table>
-  <tr>
-    <td align="center">
-      <img src="static/aquileschat.PNG" alt="Chat Interface" width="2048px"/><br/>
-      <em>Chat interface</em>
-    </td>
-    <td align="center">
-      <img src="static/aquilesup.PNG" alt="Document Upload" width="2048px"/><br/>
-      <em>Upload form</em>
-    </td>
-  </tr>
-</table>
+### Chat interface
+<p align="center">
+  <img src="static/aquileschat.PNG" alt="Chat Interface" width="800px"/><br/>
+  <em>Chat interface</em>
+</p>
+
+### Upload form
+<p align="center">
+  <img src="static/aquilesup.PNG" alt="Document Upload" width="800px"/><br/>
+  <em>Upload form</em>
+</p>
 
 
 ## 🔍 API Endpoints & WebSocket
