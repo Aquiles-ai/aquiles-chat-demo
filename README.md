@@ -87,11 +87,11 @@ Project UI in action:
 <table>
   <tr>
     <td align="center">
-      <img src="static/aquileschat.PNG" alt="Chat Interface" width="300px"/><br/>
+      <img src="static/aquileschat.PNG" alt="Chat Interface" width="1024px"/><br/>
       <em>Chat interface</em>
     </td>
     <td align="center">
-      <img src="static/aquilesup.PNG" alt="Document Upload" width="300px"/><br/>
+      <img src="static/aquilesup.PNG" alt="Document Upload" width="1024px"/><br/>
       <em>Upload form</em>
     </td>
   </tr>
