@@ -2,6 +2,8 @@
 
 A demo chatbot that uses **[Aquiles-RAG](https://github.com/Aquiles-ai/Aquiles-RAG)** as a Retrieval-Augmented Generation (RAG) server to index documents and answer queries by combining semantic search with GPT-4.1.
 
+▶️ [Watch the demo on YouTube](https://youtu.be/LjGyX_0CLGY?si=3gUF8KO64ivnwyWe)
+
 ## 📂 Project Structure
 
 ```
